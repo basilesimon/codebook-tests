@@ -40,6 +40,14 @@ These are:
 | **datatype** | Type of data as listed within the database |
 | **datatype\_description** | Description of datatype in plain language |
 | **values** | List of values as present on our back-end, separated by semi-colon. |
-| **definitions** | Definitions, where available, of the values column. Any values which do not have a definition are omitted for the sake of brevity. Each grouping of value and its definition is separated by a semi-colon. Values and their definition are separated by a colon. |
-| **conditions** | Conditions necessary for a column to be correctly filled in the back-end. Cells containing conditionals mean that a field in the dataset can only be activated or filled when that conditional is met. Cells with just the name of another column means that it requires that column to be filled. |
+| **definitions** | Definitions, where available, of the values column. Any values which do not have a definition are omitted for the sake of brevity. Each grouping of value and its definition is separated by a semi-colon. Values and their definition are separated by a colon. Any values missing mean that their definition does not exist or that it does not require a definition. |
+| **conditions** | Conditions necessary for a column to be correctly filled in the back-end. Cells containing conditionals mean that a field in the dataset can only be activated or filled when that conditional is met. Cells with just the name of another column mean that it requires that column to be filled. |
 
+# 4.0. Updates
+
+## 2026-01-22
+
+- Definitions of values in the **definitions** column which are *NULL* are now omitted. This means that there might be a discrepancy in total values between the **definitions** and **values** columns. Any omission should be taken as a lack of need to describe said value, or that currently a definition of said value does not currently exist.
+- Updated the description of the **definitions** column to reflect above change.
+- Created the **versions** folder to hold previous versions of our codebook.
+- General clean up of typos and punctuation.
