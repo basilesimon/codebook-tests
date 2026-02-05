@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airwars Codebook — Visual Schema</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface-hover: #222633;
+    --border: #2e3346;
+    --text: #e1e4ed;
+    --text-muted: #8b90a0;
+    --accent: #6c8cff;
+    --accent-dim: rgba(108,140,255,0.12);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.12);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.12);
+    --rose: #f472b6;
+    --rose-dim: rgba(244,114,182,0.12);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.12);
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34,211,238,0.12);
+    --line-incidents: #6c8cff;
+    --line-belligerents: #34d399;
+    --line-infrastructure: #fbbf24;
+    --line-victims: #f472b6;
+    --line-casualties: #a78bfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(108,140,255,0.06) 0%, transparent 100%);
+  }
+
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ER Diagram */
+  .er-section {
+    padding: 40px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .er-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
+  }
+
+  .er-diagram {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 24px 0;
+  }
+
+  .er-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .er-ring {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .er-node {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    min-width: 200px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .er-node:hover {
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .er-node.incidents { border-color: var(--line-incidents); }
+  .er-node.belligerents { border-color: var(--line-belligerents); }
+  .er-node.infrastructure { border-color: var(--line-infrastructure); }
+  .er-node.victims { border-color: var(--line-victims); }
+  .er-node.casualties { border-color: var(--line-casualties); }
+
+  .er-node-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .er-node.incidents .er-node-name { color: var(--line-incidents); }
+  .er-node.belligerents .er-node-name { color: var(--line-belligerents); }
+  .er-node.infrastructure .er-node-name { color: var(--line-infrastructure); }
+  .er-node.victims .er-node-name { color: var(--line-victims); }
+  .er-node.casualties .er-node-name { color: var(--line-casualties); }
+
+  .er-node-count {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .er-node-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .er-node.incidents .er-node-badge { background: var(--line-incidents); }
+  .er-node.belligerents .er-node-badge { background: var(--line-belligerents); }
+  .er-node.infrastructure .er-node-badge { background: var(--line-infrastructure); }
+  .er-node.victims .er-node-badge { background: var(--line-victims); }
+  .er-node.casualties .er-node-badge { background: var(--line-casualties); }
+
+  .er-connectors {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 8px 0 16px;
+  }
+
+  .er-connector-line {
+    width: 2px;
+    height: 32px;
+    position: relative;
+  }
+
+  .er-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  /* Relationship arrows using SVG */
+  .er-relationships {
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  .er-relationships svg {
+    width: 100%;
+    height: 60px;
+    overflow: visible;
+  }
+
+  /* Table details */
+  .tables-section {
+    padding: 0 24px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .table-header:hover {
+    background: var(--surface-hover);
+  }
+
+  .table-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .table-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .table-card.incidents .table-dot { background: var(--line-incidents); }
+  .table-card.belligerents .table-dot { background: var(--line-belligerents); }
+  .table-card.infrastructure .table-dot { background: var(--line-infrastructure); }
+  .table-card.victims .table-dot { background: var(--line-victims); }
+  .table-card.casualties .table-dot { background: var(--line-casualties); }
+
+  .table-header-title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .table-header-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .table-chevron {
+    font-size: 18px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+  }
+
+  .table-card.open .table-chevron {
+    transform: rotate(180deg);
+  }
+
+  .table-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .table-card.open .table-body {
+    display: block;
+  }
+
+  .table-description {
+    padding: 16px 24px;
+    color: var(--text-muted);
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .table-description .fk-note {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--accent-dim);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 260px 140px 1fr;
+    padding: 10px 24px;
+    border-bottom: 1px solid rgba(46,51,70,0.5);
+    font-size: 13px;
+    align-items: start;
+    transition: background 0.1s;
+  }
+
+  .field-row:hover {
+    background: var(--surface-hover);
+  }
+
+  .field-row:last-child {
+    border-bottom: none;
+  }
+
+  .field-row-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 12px 24px 8px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .field-name {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .field-name .pk-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--amber-dim);
+    color: var(--amber);
+    font-family: Inter, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .field-name .fk-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-family: Inter, sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .field-type {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .type-pill {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .type-int { background: var(--accent-dim); color: var(--accent); }
+  .type-varchar { background: var(--green-dim); color: var(--green); }
+  .type-text { background: var(--purple-dim); color: var(--purple); }
+  .type-date { background: var(--amber-dim); color: var(--amber); }
+  .type-datetime { background: var(--amber-dim); color: var(--amber); }
+  .type-time { background: var(--amber-dim); color: var(--amber); }
+  .type-tinyint { background: var(--rose-dim); color: var(--rose); }
+  .type-double { background: var(--cyan-dim); color: var(--cyan); }
+
+  .field-desc {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .field-values {
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .value-chip {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-muted);
+    font-family: monospace;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .value-overflow {
+    font-size: 10px;
+    color: var(--text-muted);
+    padding: 1px 6px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .field-condition {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--amber);
+    font-style: italic;
+  }
+
+  /* Data type legend */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .field-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    .field-row-header {
+      display: none;
+    }
+    .er-ring {
+      flex-direction: column;
+      align-items: center;
+    }
+    .stats-bar {
+      gap: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>Airwars</span> Codebook</h1>
+  <p>Visual schema of the Airwars civilian harm monitoring datasets. Five interconnected tables documenting incidents, belligerents, infrastructure, victims, and casualties across multiple conflict zones.</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-value">5</div>
+    <div class="stat-label">Tables</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">134</div>
+    <div class="stat-label">Total Fields</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">8</div>
+    <div class="stat-label">Data Types</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">2026-01-22</div>
+    <div class="stat-label">Last Updated</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="type-pill type-int">int</span> Whole number</div>
+  <div class="legend-item"><span class="type-pill type-varchar">varchar</span> Text (short)</div>
+  <div class="legend-item"><span class="type-pill type-text">text</span> Text (long)</div>
+  <div class="legend-item"><span class="type-pill type-date">date</span> Date</div>
+  <div class="legend-item"><span class="type-pill type-datetime">datetime</span> Date &amp; time</div>
+  <div class="legend-item"><span class="type-pill type-time">time</span> Time only</div>
+  <div class="legend-item"><span class="type-pill type-tinyint">tinyint</span> True / False</div>
+  <div class="legend-item"><span class="type-pill type-double">double</span> Decimal</div>
+</div>
+
+<div class="er-section">
+  <h2>Entity Relationship Overview</h2>
+  <div class="er-diagram">
+    <div class="er-center">
+      <div class="er-node incidents" onclick="scrollToTable('incidents')">
+        <div class="er-node-badge">70</div>
+        <div class="er-node-name">aw_data_civcas_incidents</div>
+        <div class="er-node-count">Central table &middot; 70 fields</div>
+      </div>
+    </div>
+
+    <div class="er-label">linked via post_id &amp; code &nbsp;&#x25BC;</div>
+
+    <div class="er-ring">
+      <div class="er-node belligerents" onclick="scrollToTable('belligerents')">
+        <div class="er-node-badge">16</div>
+        <div class="er-node-name">aw_data_civcas_belligerents</div>
+        <div class="er-node-count">Perpetrator data &middot; 16 fields</div>
+      </div>
+      <div class="er-node infrastructure" onclick="scrollToTable('infrastructure')">
+        <div class="er-node-badge">8</div>
+        <div class="er-node-name">aw_data_civcas_infrastructure</div>
+        <div class="er-node-count">Damage records &middot; 8 fields</div>
+      </div>
+      <div class="er-node victims" onclick="scrollToTable('victims')">
+        <div class="er-node-badge">18</div>
+        <div class="er-node-name">aw_data_civcas_victims</div>
+        <div class="er-node-count">Individual records &middot; 18 fields</div>
+      </div>
+      <div class="er-node casualties" onclick="scrollToTable('casualties')">
+        <div class="er-node-badge">11</div>
+        <div class="er-node-name">aw_data_civcas_casualties</div>
+        <div class="er-node-count">Aggregate stats &middot; 11 fields</div>
+      </div>
+    </div>
+  </div>
+
+  <svg width="100%" height="60" viewBox="0 0 1000 60" preserveAspectRatio="xMidYMid meet" style="display:block;margin:-20px auto 16px;">
+    <defs>
+      <marker id="arrow-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#34d399"/></marker>
+      <marker id="arrow-a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fbbf24"/></marker>
+      <marker id="arrow-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f472b6"/></marker>
+      <marker id="arrow-p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a78bfa"/></marker>
+    </defs>
+    <line x1="500" y1="0" x2="175" y2="55" stroke="#34d399" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-g)"/>
+    <line x1="500" y1="0" x2="400" y2="55" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-a)"/>
+    <line x1="500" y1="0" x2="625" y2="55" stroke="#f472b6" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-r)"/>
+    <line x1="500" y1="0" x2="850" y2="55" stroke="#a78bfa" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-p)"/>
+    <text x="500" y="10" fill="#6c8cff" font-size="10" text-anchor="middle" font-weight="600">INCIDENTS</text>
+    <text x="175" y="55" fill="#34d399" font-size="9" text-anchor="middle" dy="12">BELLIGERENTS</text>
+    <text x="400" y="55" fill="#fbbf24" font-size="9" text-anchor="middle" dy="12">INFRASTRUCTURE</text>
+    <text x="625" y="55" fill="#f472b6" font-size="9" text-anchor="middle" dy="12">VICTIMS</text>
+    <text x="850" y="55" fill="#a78bfa" font-size="9" text-anchor="middle" dy="12">CASUALTIES</text>
+  </svg>
+</div>
+
+<div class="tables-section" id="tables">
+
+  <!-- INCIDENTS -->
+  <div class="table-card incidents open" id="table-incidents">
+    <div class="table-header" onclick="toggleTable(this)">
+      <div class="table-header-left">
+        <div class="table-dot"></div>
+        <div>
+          <div class="table-header-title">aw_data_civcas_incidents</div>
+          <div class="table-header-meta">Central incident records &middot; 70 fields</div>
+        </div>
+      </div>
+      <div class="table-chevron">&#x25BC;</div>
+    </div>
+    <div class="table-body">
+      <div class="table-description">
+        The primary dataset containing unique records of reported civilian harm incidents. Each row represents a single incident with details on timing, location, military action, assessment grading, casualty counts, and source tracking. All other tables link back to this table via <code>post_id</code> and <code>code</code>.
+      </div>
+      <div class="field-row field-row-header">
+        <div>Column</div>
+        <div>Data Type</div>
+        <div>Description / Values</div>
+      </div>
+      <!-- Incidents fields populated by JS -->
+      <div id="fields-incidents"></div>
+    </div>
+  </div>
+
+  <!-- BELLIGERENTS -->
+  <div class="table-card belligerents" id="table-belligerents">
+    <div class="table-header" onclick="toggleTable(this)">
+      <div class="table-header-left">
+        <div class="table-dot"></div>
+        <div>
+          <div class="table-header-title">aw_data_civcas_belligerents</div>
+          <div class="table-header-meta">Perpetrator / belligerent data &middot; 16 fields</div>
+        </div>
+      </div>
+      <div class="table-chevron">&#x25BC;</div>
+    </div>
+    <div class="table-body">
+      <div class="table-description">
+        Tracks the reported perpetrators (military forces, coalitions, militant groups) associated with each incident, including their public statements, assessments, conceded casualties, and geolocation data.
+        <div class="fk-note">Foreign keys: <code>post_id</code> and <code>code</code> reference <code>aw_data_civcas_incidents</code></div>
+      </div>
+      <div class="field-row field-row-header">
+        <div>Column</div>
+        <div>Data Type</div>
+        <div>Description / Values</div>
+      </div>
+      <div id="fields-belligerents"></div>
+    </div>
+  </div>
+
+  <!-- INFRASTRUCTURE -->
+  <div class="table-card infrastructure" id="table-infrastructure">
+    <div class="table-header" onclick="toggleTable(this)">
+      <div class="table-header-left">
+        <div class="table-dot"></div>
+        <div>
+          <div class="table-header-title">aw_data_civcas_infrastructure</div>
+          <div class="table-header-meta">Damage &amp; destruction records &middot; 8 fields</div>
+        </div>
+      </div>
+      <div class="table-chevron">&#x25BC;</div>
+    </div>
+    <div class="table-body">
+      <div class="table-description">
+        Documents infrastructure damaged or destroyed in each incident, categorised by facility type (e.g. hospital, school, residential) with information on whether the target was declared and the extent of destruction.
+        <div class="fk-note">Foreign keys: <code>post_id</code> and <code>code</code> reference <code>aw_data_civcas_incidents</code></div>
+      </div>
+      <div class="field-row field-row-header">
+        <div>Column</div>
+        <div>Data Type</div>
+        <div>Description / Values</div>
+      </div>
+      <div id="fields-infrastructure"></div>
+    </div>
+  </div>
+
+  <!-- VICTIMS -->
+  <div class="table-card victims" id="table-victims">
+    <div class="table-header" onclick="toggleTable(this)">
+      <div class="table-header-left">
+        <div class="table-dot"></div>
+        <div>
+          <div class="table-header-title">aw_data_civcas_victims</div>
+          <div class="table-header-meta">Individual victim records &middot; 18 fields</div>
+        </div>
+      </div>
+      <div class="table-chevron">&#x25BC;</div>
+    </div>
+    <div class="table-body">
+      <div class="table-description">
+        Individual-level records for named victims, including personal details (name, profession, gender, age), whether they were killed or injured, and family group tracking for reconciliation purposes.
+        <div class="fk-note">Foreign keys: <code>post_id</code> and <code>code</code> reference <code>aw_data_civcas_incidents</code></div>
+      </div>
+      <div class="field-row field-row-header">
+        <div>Column</div>
+        <div>Data Type</div>
+        <div>Description / Values</div>
+      </div>
+      <div id="fields-victims"></div>
+    </div>
+  </div>
+
+  <!-- CASUALTIES -->
+  <div class="table-card casualties" id="table-casualties">
+    <div class="table-header" onclick="toggleTable(this)">
+      <div class="table-header-left">
+        <div class="table-dot"></div>
+        <div>
+          <div class="table-header-title">aw_data_civcas_casualties</div>
+          <div class="table-header-meta">Aggregate casualty statistics &middot; 11 fields</div>
+        </div>
+      </div>
+      <div class="table-chevron">&#x25BC;</div>
+    </div>
+    <div class="table-body">
+      <div class="table-description">
+        Aggregated casualty statistics by demographic category (children, men, women), professional affiliation (journalism, healthcare, etc.), and protected person status, with min/max ranges for killed and injured.
+        <div class="fk-note">Foreign keys: <code>post_id</code> and <code>code</code> reference <code>aw_data_civcas_incidents</code></div>
+      </div>
+      <div class="field-row field-row-header">
+        <div>Column</div>
+        <div>Data Type</div>
+        <div>Description / Values</div>
+      </div>
+      <div id="fields-casualties"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Airwars Codebook v2026-01-22 &middot; <a href="https://airwars.org/casualty-recording/">airwars.org</a> &middot; Contact: <a href="mailto:info@airwars.org">info@airwars.org</a>
+</footer>
+
+<script>
+const codebook = [
+  // aw_data_civcas_incidents
+  {t:"incidents",c:"id",dt:"int(11) unsigned",dd:"Whole number",v:"",d:"",cond:"",pk:true},
+  {t:"incidents",c:"post_id",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"post_status",dt:"varchar(255)",dd:"Text (short)",v:"draft;publish",d:"",cond:""},
+  {t:"incidents",c:"permalink",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"incidents",c:"code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Unique incident code (e.g. CS123)",cond:""},
+  {t:"incidents",c:"previous_codes",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"incidents",c:"date_type",dt:"varchar(255)",dd:"Text (short)",v:"date;date_range",d:"Date: single date; Date range: multiple days",cond:""},
+  {t:"incidents",c:"date",dt:"date",dd:"Date",v:"",d:"Date of incident, or start date when Date range is selected",cond:""},
+  {t:"incidents",c:"date_end",dt:"date",dd:"Date",v:"",d:"End date when Date range is selected",cond:"incident_date_type = date_range"},
+  {t:"incidents",c:"local_time_type",dt:"varchar(255)",dd:"Text (short)",v:"unknown;exact;approximate;window;first_reported;approximate_time_of_day",d:"Type of time of day reported by local sources",cond:""},
+  {t:"incidents",c:"local_time",dt:"time",dd:"Time only",v:"",d:"",cond:"local_time_type = exact OR approximate"},
+  {t:"incidents",c:"local_time_start",dt:"time",dd:"Time only",v:"",d:"",cond:"local_time_type = window"},
+  {t:"incidents",c:"local_time_end",dt:"time",dd:"Time only",v:"",d:"",cond:"local_time_type = window"},
+  {t:"incidents",c:"local_time_of_day",dt:"varchar(255)",dd:"Text (short)",v:"around_dawn;around_midday;around_dusk;around_midnight;after_midnight;during_the_day;during_the_night;morning;afternoon;evening",d:"",cond:"local_time_type = approximate_time_of_day"},
+  {t:"incidents",c:"local_first_reported_date_time",dt:"datetime",dd:"Date and time",v:"",d:"",cond:"local_time_type = first_reported"},
+  {t:"incidents",c:"local_first_reported_by",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"incidents",c:"local_first_reported_url",dt:"text",dd:"Text (long)",v:"",d:"",cond:""},
+  {t:"incidents",c:"country_slug",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Country in which the incident took place",cond:""},
+  {t:"incidents",c:"location_name",dt:"text",dd:"Text (long)",v:"",d:"",cond:""},
+  {t:"incidents",c:"location_name_local",dt:"text",dd:"Text (long)",v:"",d:"",cond:""},
+  {t:"incidents",c:"region",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Lowest administrative level of the incident location",cond:""},
+  {t:"incidents",c:"strike_status_slug",dt:"varchar(255)",dd:"Text (short)",v:"contested-strike;declared-strike;likely-strike;single-source-claim;unknown",d:"Grade indicating degree of source consensus on belligerent",cond:""},
+  {t:"incidents",c:"strike_type_slug",dt:"varchar(255)",dd:"Text (short)",v:"airstrike;airstrike-and-or-artillery;artillery;counter-terrorism-action-ground;drone-strike;ground-operation;naval-bombardment;unknown",d:"Method of military action or operation type",cond:""},
+  {t:"incidents",c:"targeted_belligerent_slug",dt:"varchar(255)",dd:"Text (short)",v:"afghan-taliban;al-qaeda;al-shabaab;assad-regime;hamas;hezbollah;houthis;isis;israeli-military;nato-forces;russian-military;turkish-forces;ukrainian-military;us;ypg-sdf;+more",d:"Name of the targeted belligerent(s)",cond:""},
+  {t:"incidents",c:"observation_slug",dt:"varchar(255)",dd:"Text (short)",v:"cluster-munitions;double-tap-strike;entire-family-killed;hostage-killed-or-injured;no-warning;us-sourced-munition;+more",d:"Notable characteristics or recurring features",cond:""},
+  {t:"incidents",c:"impact_slug",dt:"varchar(255)",dd:"Text (short)",v:"education;food;healthcare",d:"Sectoral impact categories",cond:""},
+  {t:"incidents",c:"pattern_slug",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"incidents",c:"total_strikes",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"civilian_harm_reported",dt:"tinyint(1)",dd:"True or False",v:"",d:"",cond:""},
+  {t:"incidents",c:"civilian_harm_status_slug",dt:"varchar(255)",dd:"Text (short)",v:"confirmed;fair;weak;contested;discounted;unknown",d:"Grade indicating strength of reporting on civilian harm",cond:""},
+  {t:"incidents",c:"cause_of_death_injury_slug",dt:"varchar(255)",dd:"Text (short)",v:"chemical-biological-radiological-nuclear-cbrn;heavy-weapons-and-explosive-munitions;incendiary;small-arms-and-light-weapons;planted-explosives-and-unexploded-ordnance-uxo;unknown;+more",d:"Reported source(s) of harm",cond:""},
+  {t:"incidents",c:"latitude",dt:"double",dd:"Large decimal",v:"",d:"",cond:""},
+  {t:"incidents",c:"longitude",dt:"double",dd:"Large decimal",v:"",d:"",cond:""},
+  {t:"incidents",c:"geolocation_accuracy_slug",dt:"varchar(255)",dd:"Text (short)",v:"province_governorate;district;subdistrict;city;town;village;neighbourhood_area;street;nearby_landmark;within_100m;within_1m;exact_location;exact_location_coalition;exact_location_other",d:"Grade indicating geolocation accuracy",cond:""},
+  {t:"incidents",c:"num_victims",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_victims_named",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_victims_named_english",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_victims_named_local",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_reconciled",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_families",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_individuals",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"victim_average_age",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_sources",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_sources_twitter",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_sources_facebook",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_sources_telegram",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_sources_other",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"num_media",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"declassified_assessment",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Declassified assessment from US DoD reporting",cond:""},
+  {t:"incidents",c:"press_release",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Public press release from US military",cond:""},
+  {t:"incidents",c:"civilian_non_combatants_killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"civilian_non_combatants_killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"civilian_non_combatants_injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"civilian_non_combatants_injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"children_killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"Follows ICRC child soldier designation",cond:"civilian_non_combatants_killed_min"},
+  {t:"incidents",c:"children_killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_killed_max"},
+  {t:"incidents",c:"children_injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_min"},
+  {t:"incidents",c:"children_injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_max"},
+  {t:"incidents",c:"women_killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_killed_min"},
+  {t:"incidents",c:"women_killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_killed_max"},
+  {t:"incidents",c:"women_injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_min"},
+  {t:"incidents",c:"women_injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_max"},
+  {t:"incidents",c:"men_killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_killed_min"},
+  {t:"incidents",c:"men_killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_killed_max"},
+  {t:"incidents",c:"men_injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_min"},
+  {t:"incidents",c:"men_injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:"civilian_non_combatants_injured_max"},
+  {t:"incidents",c:"belligerents_killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"belligerents_killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"belligerents_injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"incidents",c:"belligerents_injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+
+  // aw_data_civcas_belligerents
+  {t:"belligerents",c:"id",dt:"int(11) unsigned",dd:"Whole number",v:"",d:"",cond:"",pk:true},
+  {t:"belligerents",c:"post_id",dt:"int(11)",dd:"Whole number",v:"",d:"Refers to post_id from incidents",cond:"",fk:true},
+  {t:"belligerents",c:"code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Refers to code from incidents",cond:"",fk:true},
+  {t:"belligerents",c:"belligerent_id",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"belligerents",c:"belligerent_slug",dt:"varchar(255)",dd:"Text (short)",v:"us-forces;russian-military;israeli-military;nato-forces;turkish-military;coalition;syrian-regime;saudi-led-coalition;+more",d:"Reported perpetrator (55+ values)",cond:""},
+  {t:"belligerents",c:"type",dt:"varchar(255)",dd:"Text (short)",v:"suspected;known",d:"Suspected: local sources only; Known: public statement made",cond:""},
+  {t:"belligerents",c:"assessment_slug",dt:"varchar(255)",dd:"Text (short)",v:"credible-substantiated;duplicate;non-credible-unsubstantiated;not-yet-assessed;open-incident;under-investigation",d:"Belligerent statement assessment",cond:""},
+  {t:"belligerents",c:"deaths_conceded_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"belligerents",c:"deaths_conceded_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"belligerents",c:"injuries_conceded_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"belligerents",c:"injuries_conceded_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"belligerents",c:"location",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Location given by belligerent in their statement",cond:"assessment != not_yet_assessed"},
+  {t:"belligerents",c:"mgrs_coordinate",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Military Grid Reference System",cond:""},
+  {t:"belligerents",c:"mgrs_accuracy",dt:"varchar(255)",dd:"Text (short)",v:"1 m;10 m;100 m",d:"Accuracy of MGRS code",cond:""},
+  {t:"belligerents",c:"civcas_statements",dt:"text",dd:"Text (long)",v:"",d:"Copy of statement regarding CIVCAS allegation",cond:""},
+  {t:"belligerents",c:"strike_reports",dt:"text",dd:"Text (long)",v:"",d:"Copy of strike report(s) released by belligerent",cond:""},
+
+  // aw_data_civcas_infrastructure
+  {t:"infrastructure",c:"id",dt:"int(11) unsigned",dd:"Whole number",v:"",d:"",cond:"",pk:true},
+  {t:"infrastructure",c:"post_id",dt:"int(11)",dd:"Whole number",v:"",d:"Refers to post_id from incidents",cond:"",fk:true},
+  {t:"infrastructure",c:"code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Refers to code from incidents",cond:"",fk:true},
+  {t:"infrastructure",c:"infrastructure_group_slug",dt:"varchar(255)",dd:"Text (short)",v:"agriculture;commerce;communications;cultural-site;education;emergency-services;financial;healthcare;humanitarian;idp-camp;legal;media;religious;residential;resources;transportation;vehicle;warehouse;water",d:"Category of affected facility or location",cond:""},
+  {t:"infrastructure",c:"infrastructure_slug",dt:"varchar(255)",dd:"Text (short)",v:"hospital;school;market;mosque;house;apartment-building;road;bridge;ambulance;bakery;+more",d:"Specific type of affected facility (82+ values)",cond:""},
+  {t:"infrastructure",c:"infrastructure_affiliation_slug",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Affiliation taxonomy",cond:""},
+  {t:"infrastructure",c:"infrastructure_declared_target_slug",dt:"varchar(255)",dd:"Text (short)",v:"no;yes",d:"Whether this was a declared target",cond:""},
+  {t:"infrastructure",c:"infrastructure_destruction_slug",dt:"varchar(255)",dd:"Text (short)",v:"complete;partial",d:"Extent of destruction",cond:""},
+
+  // aw_data_civcas_victims
+  {t:"victims",c:"id",dt:"int(11) unsigned",dd:"Whole number",v:"",d:"",cond:"",pk:true},
+  {t:"victims",c:"post_id",dt:"int(11)",dd:"Whole number",v:"",d:"Refers to post_id from incidents",cond:"",fk:true},
+  {t:"victims",c:"code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Refers to code from incidents",cond:"",fk:true},
+  {t:"victims",c:"date",dt:"date",dd:"Date",v:"",d:"Refers to date from incidents",cond:""},
+  {t:"victims",c:"name",dt:"varchar(255)",dd:"Text (short)",v:"",d:"English transliteration",cond:""},
+  {t:"victims",c:"name_local",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"victims",c:"profession",dt:"varchar(255)",dd:"Text (short)",v:"agriculture;art;civil-service;commerce;education;emergency-response;engineering;government;healthcare;humanitarian;journalism;law;religion;security;sports;transportation;united-nations",d:"Professional category",cond:""},
+  {t:"victims",c:"gender",dt:"varchar(255)",dd:"Text (short)",v:"female;male",d:"",cond:""},
+  {t:"victims",c:"pregnant",dt:"tinyint(1)",dd:"True or False",v:"",d:"",cond:""},
+  {t:"victims",c:"age_group",dt:"varchar(255)",dd:"Text (short)",v:"child;adult",d:"May be NULL if no sources indicate age group",cond:""},
+  {t:"victims",c:"age",dt:"int(11)",dd:"Whole number",v:"",d:"May be NULL if sources do not indicate exact age",cond:""},
+  {t:"victims",c:"killed_or_injured",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"victims",c:"additional_notes",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"victims",c:"url",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"victims",c:"reconciliation_id",dt:"varchar(255)",dd:"Text (short)",v:"",d:"National ID from Palestinian Ministry of Health",cond:""},
+  {t:"victims",c:"group_code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"Code for the family to which an individual belongs",cond:""},
+  {t:"victims",c:"in_group",dt:"tinyint(1)",dd:"True or False",v:"",d:"",cond:""},
+  {t:"victims",c:"num_group_members",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+
+  // aw_data_civcas_casualties
+  {t:"casualties",c:"id",dt:"int(11) unsigned",dd:"Whole number",v:"",d:"",cond:"",pk:true},
+  {t:"casualties",c:"post_id",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"casualties",c:"code",dt:"varchar(255)",dd:"Text (short)",v:"",d:"",cond:""},
+  {t:"casualties",c:"casualty_type_taxonomy",dt:"varchar(255)",dd:"Text (short)",v:"Casualty;Profession;Protected Person",d:"",cond:""},
+  {t:"casualties",c:"casualty_type_slug",dt:"varchar(255)",dd:"Text (short)",v:"children;men;women;agriculture;art;civil-service;commerce;education;emergency-response;engineering;government;healthcare;humanitarian;journalism;law;religion;security;sports;transportation;united-nations;hors-de-combat",d:"Demographic or professional category",cond:""},
+  {t:"casualties",c:"casualty_affiliation_slug",dt:"varchar(255)",dd:"Text (short)",v:"civil-society;foreign-government;humanitarian;local-authority;militant;private;united-nations",d:"",cond:""},
+  {t:"casualties",c:"while_working",dt:"tinyint(1)",dd:"True or False",v:"",d:"",cond:""},
+  {t:"casualties",c:"killed_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"casualties",c:"killed_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"casualties",c:"injured_min",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+  {t:"casualties",c:"injured_max",dt:"int(11)",dd:"Whole number",v:"",d:"",cond:""},
+];
+
+function getTypeClass(dt) {
+  if (dt.startsWith('int') || dt.startsWith('int(11) unsigned')) return 'type-int';
+  if (dt.startsWith('varchar')) return 'type-varchar';
+  if (dt === 'text') return 'type-text';
+  if (dt === 'datetime') return 'type-datetime';
+  if (dt === 'date') return 'type-date';
+  if (dt === 'time') return 'type-time';
+  if (dt.startsWith('tinyint')) return 'type-tinyint';
+  if (dt === 'double') return 'type-double';
+  return 'type-varchar';
+}
+
+function getTypeLabel(dt) {
+  if (dt.startsWith('int(11) unsigned')) return 'int (unsigned)';
+  if (dt.startsWith('int')) return 'int';
+  if (dt.startsWith('varchar')) return 'varchar';
+  if (dt === 'text') return 'text';
+  if (dt === 'datetime') return 'datetime';
+  if (dt === 'date') return 'date';
+  if (dt === 'time') return 'time';
+  if (dt.startsWith('tinyint')) return 'boolean';
+  if (dt === 'double') return 'double';
+  return dt;
+}
+
+function renderValues(v) {
+  if (!v) return '';
+  const vals = v.split(';');
+  const MAX = 8;
+  let html = '<div class="field-values">';
+  const show = vals.slice(0, MAX);
+  show.forEach(val => {
+    html += `<span class="value-chip">${val.trim()}</span>`;
+  });
+  if (vals.length > MAX) {
+    html += `<span class="value-chip" style="opacity:0.6">+${vals.length - MAX} more</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderField(f) {
+  let badges = '';
+  if (f.pk) badges += '<span class="pk-badge">PK</span>';
+  if (f.fk) badges += '<span class="fk-badge">FK</span>';
+
+  let desc = f.d ? `<div>${f.d}</div>` : '';
+  let values = renderValues(f.v);
+  let cond = f.cond ? `<div class="field-condition">Condition: ${f.cond}</div>` : '';
+
+  return `<div class="field-row">
+    <div class="field-name">${f.c} ${badges}</div>
+    <div class="field-type"><span class="type-pill ${getTypeClass(f.dt)}">${getTypeLabel(f.dt)}</span></div>
+    <div class="field-desc">${desc}${values}${cond}</div>
+  </div>`;
+}
+
+const tables = ['incidents','belligerents','infrastructure','victims','casualties'];
+tables.forEach(t => {
+  const fields = codebook.filter(f => f.t === t);
+  const container = document.getElementById('fields-' + t);
+  if (container) {
+    container.innerHTML = fields.map(renderField).join('');
+  }
+});
+
+function toggleTable(header) {
+  header.closest('.table-card').classList.toggle('open');
+}
+
+function scrollToTable(name) {
+  const el = document.getElementById('table-' + name);
+  if (el) {
+    if (!el.classList.contains('open')) el.classList.add('open');
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+</script>
+</body>
+</html>
