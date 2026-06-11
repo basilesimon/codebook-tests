@@ -45,6 +45,16 @@ These are:
 
 # 4.0. Updates
 
+## 2026-06-11
+
+- Updated the definition of **targeted_belligerent_slug** to clarify that its values originate from military statements issued by the alleged targeting belligerent.
+- Added a note to the **pattern_slug** description identifying it as specific to the 2023 Israeli Military actions in The Palestinian Territories (The Gaza Strip).
+- Added a definition for **num_reconciled** stating that this is a sum of **reconciled_id** from **aw_data_civcas_victims**.
+- The following columns now have a definition explaining the difference between a *NULL* value and a *ZERO*: **civilian_non_combatants_killed_min, civilian_non_combatants_killed_max, civilian_non_combatants_injured_min, civilian_non_combatants_injured_max, children_killed_min, children_killed_max, children_injured_min, children_injured_max, women_killed_min, woman_killed_max, women_injured_min, women_injured_max, men_killed_min, men_killed_max, men_injured_min, men_injured_max**. This also applies to the following, however these columns now have a clarification stating that the number originates from the *local sources*: **belligerents_killed_min, belligerents_killed_max, belligerents_injured_min, belligerents_injured_max**. 
+- Added definitions to **url**, **reconciliation_id**, and **num_group_members**.
+- New columns in **aw_data_civcas_incidents**: **incident_status** and **body_of_water_slug**. Definitions for these will be added at a later update.
+- General clean up of typos and punctuation.
+
 ## 2026-01-22
 
 - Definitions of values in the **definitions** column which are *NULL* are now omitted. This means that there might be a discrepancy in total values between the **definitions** and **values** columns. Any omission should be taken as a lack of need to describe said value, or that currently a definition of said value does not currently exist.
